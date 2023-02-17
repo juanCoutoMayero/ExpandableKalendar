@@ -41,7 +41,7 @@ fun KalendarDemo() {
             .background(Color.White)
     ) {
         Kalendar(
-            kalendarType = KalendarType.Oceanic(false),
+            kalendarType = KalendarType.Oceanic(true),
             kalendarEvents = listOf(
                 KalendarEvent(LocalDate(2022, 10, 25), "Birthday"),
                 KalendarEvent(LocalDate(2022, 10, 25), "Birthday"),

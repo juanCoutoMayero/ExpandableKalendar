@@ -28,7 +28,10 @@ import com.himanshoe.kalendar.model.KalendarEvent
 import com.himanshoe.kalendar.model.KalendarType
 import com.himanshoe.kalendar.ui.firey.KalendarFirey
 import com.himanshoe.kalendar.ui.oceanic.KalendarOceanic
+import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.todayIn
 
 @Composable
 fun Kalendar(
@@ -52,7 +55,9 @@ fun Kalendar(
             kalendarThemeColors = kalendarThemeColors,
             takeMeToDate = takeMeToDate,
             kalendarHeaderConfig = kalendarHeaderConfig,
-            showWeekDays = kalendarType.showWeekDays
+            showWeekDays = kalendarType.showWeekDays,
+            weekDaysLength = 3,
+            minDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
 
         )
         KalendarType.Firey -> {
@@ -89,7 +94,9 @@ fun Kalendar(
             kalendarThemeColor = kalendarThemeColor,
             takeMeToDate = takeMeToDate,
             kalendarHeaderConfig = kalendarHeaderConfig,
-            showWeekDays = kalendarType.showWeekDays
+            showWeekDays = kalendarType.showWeekDays,
+            weekDaysLength = 3,
+            minDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
         )
         KalendarType.Firey -> {
             KalendarFirey(

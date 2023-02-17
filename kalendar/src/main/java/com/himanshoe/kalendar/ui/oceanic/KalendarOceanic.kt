@@ -59,10 +59,14 @@ fun KalendarOceanic(
     kalendarThemeColors: List<KalendarThemeColor>,
     modifier: Modifier = Modifier,
     showWeekDays: Boolean = true,
+    weekDaysLength: Int = 1,
     kalendarHeaderConfig: KalendarHeaderConfig? = null,
     kalendarEvents: List<KalendarEvent> = emptyList(),
     onCurrentDayClick: (KalendarDay, List<KalendarEvent>) -> Unit = { _, _ -> },
-) {
+    minDate: LocalDate? = null,
+    maxDate: LocalDate? = null,
+
+    ) {
     val currentDay = takeMeToDate ?: Clock.System.todayIn(TimeZone.currentSystemDefault())
     val weekValue = remember { mutableStateOf(currentDay.getNext7Dates()) }
     val month = weekValue.value.first().month
@@ -111,7 +115,7 @@ fun KalendarOceanic(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             text = localDate.dayOfWeek.getDisplayName(
                                 TextStyle.FULL, Locale.getDefault()
-                            ).take(1),
+                            ).take(weekDaysLength),
                             fontWeight = FontWeight.Normal,
                             textColor = kalendarDayColors.textColor
                         )
@@ -122,8 +126,12 @@ fun KalendarOceanic(
                         kalendarDay = localDate.toKalendarDay(),
                         kalendarEvents = kalendarEvents.filter { it.date.dayOfMonth == localDate.dayOfMonth },
                         onCurrentDayClick = { kalendarDay, events ->
-                            selectedKalendarDate.value = kalendarDay.localDate
-                            onCurrentDayClick(kalendarDay, events)
+                            if ((minDate == null || minDate <= kalendarDay.localDate) && (maxDate == null || maxDate >= kalendarDay.localDate)) {
+                                selectedKalendarDate.value = kalendarDay.localDate
+                                onCurrentDayClick(kalendarDay, events)
+                            }else{
+                                selectedKalendarDate.value = selectedKalendarDate.value
+                            }
                         },
                         kalendarDayColors = kalendarDayColors,
                         selectedKalendarDay = selectedKalendarDate.value,
@@ -140,12 +148,15 @@ fun KalendarOceanic(
 fun KalendarOceanic(
     modifier: Modifier = Modifier,
     showWeekDays: Boolean = true,
+    weekDaysLength: Int = 1,
     kalendarEvents: List<KalendarEvent> = emptyList(),
     onCurrentDayClick: (KalendarDay, List<KalendarEvent>) -> Unit = { _, _ -> },
     takeMeToDate: LocalDate?,
     kalendarDayColors: KalendarDayColors,
     kalendarThemeColor: KalendarThemeColor,
-    kalendarHeaderConfig: KalendarHeaderConfig? = null
+    kalendarHeaderConfig: KalendarHeaderConfig? = null,
+    minDate: LocalDate? = null,
+    maxDate: LocalDate? = null,
 ) {
     val currentDay = takeMeToDate ?: Clock.System.todayIn(TimeZone.currentSystemDefault())
     val weekValue = remember { mutableStateOf(currentDay.getNext7Dates()) }
@@ -190,7 +201,7 @@ fun KalendarOceanic(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             text = localDate.dayOfWeek.getDisplayName(
                                 TextStyle.FULL, Locale.getDefault()
-                            ).take(1),
+                            ).take(weekDaysLength),
                             fontWeight = FontWeight.Normal,
                             textColor = kalendarDayColors.textColor
                         )
@@ -201,8 +212,12 @@ fun KalendarOceanic(
                         kalendarEvents = kalendarEvents,
                         isCurrentDay = isCurrentDay,
                         onCurrentDayClick = { kalendarDay, events ->
-                            selectedKalendarDate.value = kalendarDay.localDate
-                            onCurrentDayClick(kalendarDay, events)
+                            if ((minDate == null || minDate <= kalendarDay.localDate) && (maxDate == null || maxDate >= kalendarDay.localDate)) {
+                                selectedKalendarDate.value = kalendarDay.localDate
+                                onCurrentDayClick(kalendarDay, events)
+                            }else{
+                                selectedKalendarDate.value = selectedKalendarDate.value
+                            }
                         },
                         selectedKalendarDay = selectedKalendarDate.value,
                         kalendarDayColors = kalendarDayColors,
