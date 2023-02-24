@@ -59,9 +59,11 @@ fun MyCustomCalendar(
     kalendarEvents: List<KalendarEvent> = emptyList(),
     onCurrentDayClick: (KalendarDay, List<KalendarEvent>) -> Unit = { _, _ -> },
     takeMeToDate: kotlinx.datetime.LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault()),
-    isExpanded: MutableState<Boolean>
+    isExpanded: MutableState<Boolean>,
+    minDate: kotlinx.datetime.LocalDate? = null,
+    maxDate: kotlinx.datetime.LocalDate? = null,
 
-) {
+    ) {
 
     val currentDateSelected = remember { mutableStateOf(takeMeToDate) }
 
@@ -89,6 +91,12 @@ fun MyCustomCalendar(
         currentYear = displayedYear.value
         currentWeek.value = getCurrentWeek(currentDateSelected.value.toJavaLocalDate())
         daysInMonth = currentMonth.minLength()
+    }
+    LaunchedEffect(isExpanded){
+        if (!isExpanded.value){
+            displayedMonth.value = currentDateSelected.value.month
+            displayedYear.value = currentDateSelected.value.year
+        }
     }
     val monthValue =
         if (currentMonth.value.toString().length == 1) "0" + currentMonth.value.toString() else currentMonth.value.toString()
@@ -121,9 +129,6 @@ fun MyCustomCalendar(
                         displayedYear.value = displayedYear.value.minus(1)
                     }
                     displayedMonth.value = displayedMonth.value.minus(1)
-                    val startDayOfMonth = "${displayedYear.value}-${displayedMonth.value.value}-01".toLocalDate()
-                    currentWeek.value = getCurrentWeek(startDayOfMonth.toJavaLocalDate())
-
                 } else {
                     currentWeek.value = getPreviousWeek(currentWeek.value[0])
                    if ( currentWeek.value.isNotEmpty() ){
@@ -140,8 +145,6 @@ fun MyCustomCalendar(
                         displayedYear.value = displayedYear.value.plus(1)
                     }
                     displayedMonth.value = displayedMonth.value.plus(1)
-                    val startDayOfMonth = "${displayedYear.value}-${displayedMonth.value.value}-01".toLocalDate()
-                    currentWeek.value = getCurrentWeek(startDayOfMonth.toJavaLocalDate())
                 }else{
                     currentWeek.value = getNextWeek(currentWeek.value[0])
                     if ( currentWeek.value.isNotEmpty() ){
@@ -175,17 +178,23 @@ fun MyCustomCalendar(
                                 kalendarEvents = kalendarEvents,
                                 isCurrentDay = isCurrentDay,
                                 onCurrentDayClick = { kalendarDay, events ->
-                                    currentDateSelected.value = kalendarDay.localDate
-                                    onCurrentDayClick(kalendarDay, events)
+                                    if ((minDate == null || minDate <= kalendarDay.localDate) && (maxDate == null || maxDate >= kalendarDay.localDate)) {
+                                        currentDateSelected.value = kalendarDay.localDate
+                                        currentWeek.value =
+                                            getCurrentWeek(kalendarDay.localDate.toJavaLocalDate())
+                                        onCurrentDayClick(kalendarDay, events)
+                                    }
                                 },
                                 selectedKalendarDay = currentDateSelected.value,
                                 kalendarDayColors = kalendarDayColors,
                                 dotColor = kalendarThemeColors[currentMonth.value.minus(1)].headerTextColor,
-                                dayBackgroundColor = kalendarThemeColors[currentMonth.value.minus(1)].dayBackgroundColor,
+                                dayBackgroundColor = MaterialTheme.colors.primary,
                             )
                         }
                     }
                 } else {
+                    displayedMonth.value = currentDateSelected.value.month
+                    displayedYear.value = currentDateSelected.value.year
                     items(currentWeek.value) { day ->
                         val kotlinLocalDate = day.atStartOfDay().toKotlinLocalDateTime().date
                         val isCurrentDay = kotlinLocalDate == currentDay
@@ -195,8 +204,14 @@ fun MyCustomCalendar(
                             kalendarEvents = kalendarEvents,
                             isCurrentDay = isCurrentDay,
                             onCurrentDayClick = { kalendarDay, events ->
-                                currentDateSelected.value = kalendarDay.localDate
-                                onCurrentDayClick(kalendarDay, events)
+                                if ((minDate == null || minDate <= kalendarDay.localDate) && (maxDate == null || maxDate >= kalendarDay.localDate)) {
+                                    currentDateSelected.value = kalendarDay.localDate
+                                    currentWeek.value =
+                                        getCurrentWeek(kalendarDay.localDate.toJavaLocalDate())
+                                    onCurrentDayClick(kalendarDay, events)
+                                }else{
+                                    currentDateSelected.value = currentDateSelected.value
+                                }
                             },
                             selectedKalendarDay = currentDateSelected.value,
                             kalendarDayColors = kalendarDayColors,

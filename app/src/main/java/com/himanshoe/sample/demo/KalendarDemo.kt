@@ -52,7 +52,7 @@ fun KalendarDemo() {
             weekDaysLength = 3,
             minDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
         )
-        MyCustomCalendar(isExpanded= isExpanded)
+        MyCustomCalendar(isExpanded= isExpanded, minDate = Clock.System.todayIn(TimeZone.currentSystemDefault()))
         Button(onClick = {isExpanded.value = !isExpanded.value}) {
 
         }
