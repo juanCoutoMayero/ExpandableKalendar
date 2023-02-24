@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -53,7 +54,8 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
-fun KalendarOceanic(
+fun KalendarCollapsed(
+    currentDateSelected: MutableState<LocalDate>,
     takeMeToDate: LocalDate?,
     kalendarDayColors: KalendarDayColors,
     kalendarThemeColors: List<KalendarThemeColor>,
@@ -71,7 +73,6 @@ fun KalendarOceanic(
     val weekValue = remember { mutableStateOf(currentDay.getNext7Dates()) }
     val month = weekValue.value.first().month
     val year = weekValue.value.first().year
-    val selectedKalendarDate = remember { mutableStateOf(currentDay) }
 
     Column(
         modifier = modifier
@@ -127,14 +128,14 @@ fun KalendarOceanic(
                         kalendarEvents = kalendarEvents.filter { it.date.dayOfMonth == localDate.dayOfMonth },
                         onCurrentDayClick = { kalendarDay, events ->
                             if ((minDate == null || minDate <= kalendarDay.localDate) && (maxDate == null || maxDate >= kalendarDay.localDate)) {
-                                selectedKalendarDate.value = kalendarDay.localDate
+                                currentDateSelected.value = kalendarDay.localDate
                                 onCurrentDayClick(kalendarDay, events)
                             }else{
-                                selectedKalendarDate.value = selectedKalendarDate.value
+                                currentDateSelected.value = currentDateSelected.value
                             }
                         },
                         kalendarDayColors = kalendarDayColors,
-                        selectedKalendarDay = selectedKalendarDate.value,
+                        selectedKalendarDay = currentDateSelected.value,
                         dotColor = kalendarThemeColors[month.value.minus(1)].headerTextColor,
                         dayBackgroundColor = kalendarThemeColors[month.value.minus(1)].dayBackgroundColor
                     )
@@ -145,7 +146,7 @@ fun KalendarOceanic(
 }
 
 @Composable
-fun KalendarOceanic(
+fun KalendarCollapsed(
     modifier: Modifier = Modifier,
     showWeekDays: Boolean = true,
     weekDaysLength: Int = 1,

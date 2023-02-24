@@ -40,6 +40,9 @@ android {
 }
 
 dependencies {
+    implementation ("org.jetbrains.kotlinx:kotlinx-datetime:0.2.1")
+    implementation ("androidx.compose.material:material-icons-core:1.1.0-alpha03")
+
     implementation(Deps.Compose.ui)
     implementation(Deps.Compose.material)
     implementation(Deps.Compose.uiToolingPreview)

@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -49,10 +50,10 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDate
 import kotlinx.datetime.todayIn
 
-val WeekDays = listOf("M", "T", "W", "T", "F", "S", "S")
+val WeekDays = listOf("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 @Composable
-fun KalendarFirey(
+fun KalendarExpanded(
     modifier: Modifier = Modifier,
     takeMeToDate: LocalDate?,
     kalendarDayColors: KalendarDayColors,
@@ -60,13 +61,15 @@ fun KalendarFirey(
     kalendarThemeColors: List<KalendarThemeColor>,
     kalendarEvents: List<KalendarEvent> = emptyList(),
     onCurrentDayClick: (KalendarDay, List<KalendarEvent>) -> Unit = { _, _ -> },
-) {
-    val currentDay = takeMeToDate ?: Clock.System.todayIn(TimeZone.currentSystemDefault())
+    currentDateSelected: MutableState<LocalDate>,
+
+    ) {
+    val currentDay = Clock.System.todayIn(TimeZone.currentSystemDefault())
     val displayedMonth = remember {
-        mutableStateOf(currentDay.month)
+        mutableStateOf(currentDateSelected.value.month)
     }
     val displayedYear = remember {
-        mutableStateOf(currentDay.year)
+        mutableStateOf(currentDateSelected.value.year)
     }
     val currentMonth = displayedMonth.value
     val currentYear = displayedYear.value
@@ -76,12 +79,11 @@ fun KalendarFirey(
         if (currentMonth.value.toString().length == 1) "0" + currentMonth.value.toString() else currentMonth.value.toString()
     val startDayOfMonth = "$currentYear-$monthValue-01".toLocalDate()
     val firstDayOfMonth = startDayOfMonth.dayOfWeek
-    val selectedKalendarDate = remember { mutableStateOf(currentDay) }
     val newKalenderHeaderConfig = KalendarHeaderConfig(
         kalendarTextConfig = KalendarTextConfig(
             kalendarTextSize = KalendarTextSize.SubTitle,
             kalendarTextColor = KalendarTextColor(
-                kalendarThemeColors[currentMonth.value.minus(1)].headerTextColor,
+                kalendarThemeColors[currentDateSelected.value.month.value.minus(1)].headerTextColor,
             )
         )
     )
@@ -100,15 +102,15 @@ fun KalendarFirey(
             month = displayedMonth.value,
             onPreviousClick = {
                 if (displayedMonth.value.value == 1) {
-                    displayedYear.value = displayedYear.value.minus(1)
+                    displayedYear.value = currentDateSelected.value.year.minus(1)
                 }
-                displayedMonth.value = displayedMonth.value.minus(1)
+                displayedMonth.value = currentDateSelected.value.month.minus(1)
             },
             onNextClick = {
                 if (displayedMonth.value.value == 12) {
-                    displayedYear.value = displayedYear.value.plus(1)
+                    displayedYear.value = currentDateSelected.value.year.plus(1)
                 }
-                displayedMonth.value = displayedMonth.value.plus(1)
+                displayedMonth.value = currentDateSelected.value.month.plus(1)
             },
             year = displayedYear.value,
             kalendarHeaderConfig = kalendarHeaderConfig ?: newKalenderHeaderConfig
@@ -134,10 +136,10 @@ fun KalendarFirey(
                             kalendarEvents = kalendarEvents,
                             isCurrentDay = isCurrentDay,
                             onCurrentDayClick = { kalendarDay, events ->
-                                selectedKalendarDate.value = kalendarDay.localDate
+                                currentDateSelected.value = kalendarDay.localDate
                                 onCurrentDayClick(kalendarDay, events)
                             },
-                            selectedKalendarDay = selectedKalendarDate.value,
+                            selectedKalendarDay = currentDateSelected.value,
                             kalendarDayColors = kalendarDayColors,
                             dotColor = kalendarThemeColors[currentMonth.value.minus(1)].headerTextColor,
                             dayBackgroundColor = kalendarThemeColors[currentMonth.value.minus(1)].dayBackgroundColor,
@@ -150,7 +152,7 @@ fun KalendarFirey(
 }
 
 @Composable
-fun KalendarFirey(
+fun KalendarExpanded(
     modifier: Modifier = Modifier,
     kalendarEvents: List<KalendarEvent> = emptyList(),
     onCurrentDayClick: (KalendarDay, List<KalendarEvent>) -> Unit = { _, _ -> },
